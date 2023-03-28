@@ -1,0 +1,33 @@
+#include <stdio.h>
+#define MAX 1024
+int v[MAX], w[MAX]; // por quê?
+
+    int main() {
+
+        int n,j, tam;
+        printf("Digite o tamanho do vetor:\n");
+        scanf("%d",&n);
+
+        while(n>MAX) {
+            printf("Digite outro valor. Tamanho máximo %d\n", MAX);
+            scanf("%d",&n);   
+        }
+
+    for(int i = 0; i<n; i++) {
+        printf("Digite o valor de v[%d]:\n",i);
+        scanf("%d",&v[i]);
+    }
+    
+
+    tam = n-1; /*lembrar do -1!!!!!*/
+    for(int j = 0; j<n; j++) {
+        w[j] = v[tam];
+        tam = tam-1;
+    }
+
+    j=0;
+    for(int i = 0; i<n; i++) {
+        printf("v[%d]: %d eeeeee w[%d]: %d\n", i, v[i],j, w[j]);
+        j = j+1;
+    }
+}
