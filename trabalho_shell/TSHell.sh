@@ -516,5 +516,181 @@ else
   echo -e "Não houve variação nas media dos reprovados\n"
 fi
 
-# Remove todos os arquivos .csv no diretório atual
-rm -f *.csv
+
+# Questao 10 -----------------------------------------------------------
+echo -e "\nQuestao 10:\n"
+cut -d ',' -f4,5,8,9,10 arquivo_base_filtrado.csv | awk -F ',' -v ano="2022" -v periodo="1" '$1==periodo && $2==ano' > ano_hibrido.csv
+
+calcula_media_anos_hibridos()
+{
+    cut -d ',' -f3 ano_hibrido.csv > notas_ano_hibrido.csv
+
+    soma_media=$(cut -d ',' -f1 notas_ano_hibrido.csv | paste -sd+ | bc)
+    quant_alunos=$(wc -l < ano_hibrido.csv)
+
+    media_hibrido=$(echo "scale=2; $soma_media / $quant_alunos" | bc)
+}
+
+calcula_media_anos_hibridos
+
+calcula_freq_ano_hibrido()
+{
+    cut -d ',' -f4 ano_hibrido.csv > freq_ano_hibrido.csv
+
+    soma_media=$(cut -d ',' -f1 freq_ano_hibrido.csv | paste -sd+ | bc)
+    quant_alunos=$(wc -l < ano_hibrido.csv)
+
+    media_freq_hibrido=$(echo "scale=2; $soma_media / $quant_alunos" | bc)
+}
+
+calcula_freq_ano_hibrido
+
+media_aprov_hibrido()
+{
+    status=Aprovado
+    grep "$status" ano_hibrido.csv > aprovados_hibrido.csv
+    cut -d ',' -f3 aprovados_hibrido.csv  > notas_aprov_hibrido.csv
+
+    soma_media_aprov=$(cut -d ',' -f1 notas_aprov_hibrido.csv | paste -sd+ | bc)
+    quant_alunos=$(wc -l < aprovados_ant.csv)
+
+    media_aprov_hibrido=$(echo "scale=2; $soma_media_aprov / $quant_alunos" | bc)
+}
+
+media_reprov_hibrido()
+{
+    status1=R-freq
+    status2=R-nota
+    status3=Reprovado
+
+    grep -e "$status1" -e "$status2" -e "$status3" ano_hibrido.csv > reprov_hibrido.csv
+    cut -d ',' -f3 reprov_hibrido.csv  > notas_reprov_hibrido.csv
+
+    soma_media_reprov=$(cut -d ',' -f1 notas_reprov_hibrido.csv | paste -sd+ | bc)
+    quant_alunos=$(wc -l < reprov_hibrido.csv)
+
+    media_reprov_hibrido=$(echo "scale=2; $soma_media_reprov / $quant_alunos" | bc)
+ 
+}
+
+
+compara_hibridos_pandemia()
+{
+
+    # Calcula a diferencia entre as media do ano hibrido e as medias da pandemia
+    diferenca=$(echo "$media_hibrido - $media_pandemia" | bc)
+    percentual=$(echo "scale=2; $diferenca / $media_pandemia * 100" | bc -l)
+
+    if (( $(echo "$diferenca > 0" | bc -l) )); then
+    echo -e "Media das notas do ano hibrido aumentaram em $percentual% em relacao aos anos da pandemia\n"
+    elif (( $(echo "$diferenca < 0" | bc -l) )); then
+    echo -e "Media das notas do ano hibrido diminuiram em $(echo "scale=2; $percentual * -1" | bc)% em relacao aos anos da pandemia\n"
+    else
+    echo -e "Não houve variação nas media das notas entre os anos da pandemia e o ano hibrido\n"
+    fi
+
+    # Calcula a diferencia entre as medias dos aprovados do ano hibrido e as medias dos anos de pandemia
+    diferenca=$(echo "$media_aprov_hibrido - $media_aprov_pandemia" | bc)
+    percentual=$(echo "scale=2; $diferenca / $media_aprov_pandemia * 100" | bc -l)
+
+    if (( $(echo "$diferenca > 0" | bc -l) )); then
+    echo -e "Media das notas dos aprovados do ano hibrido aumentaram em $percentual% em relacao aos anos da pandemia\n"
+    elif (( $(echo "$diferenca < 0" | bc -l) )); then
+    echo -e "Media das notas dos aprovados do ano hibrido diminuiram em $(echo "scale=2; $percentual * -1" | bc)% em relacao aos anos da pandemia\n"
+    else
+    echo -e "Não houve variação nas media das notas dos aprovados entre os anos da pandemia e o ano hibrido\n"
+    fi
+
+    # Calcula a diferenca entre as medias dos reprovados do ano hibrido e as medias dos anos da pandemia
+
+    diferenca=$(echo "$media_reprov_hibrido - $media_reprov_pandemia" | bc)
+    percentual=$(echo "scale=2; $diferenca / $media_reprov_pandemia * 100" | bc -l)
+
+    if (( $(echo "$diferenca > 0" | bc -l) )); then
+    echo -e "Media das notas dos reprovados do ano hibrido aumentaram em $percentual% em relacao aos anos da pandemia\n"
+    elif (( $(echo "$diferenca < 0" | bc -l) )); then
+    echo -e "Media das notas dos reprovados ano hibrido diminuiram em $(echo "scale=2; $percentual * -1" | bc)% em relacao aos anos da pandemia\n"
+    else
+    echo -e "Não houve variação nas media das notas dos reprovados entre os anos da pandemia e o ano hibrido\n"
+    fi
+
+
+    # Calcula a media das frequencias do ano hibrido e as medias das frequencias dos anos da pandemia
+    diferenca=$(echo "$media_freq_hibrido - $media_freq_pandemia" | bc)
+    percentual=$(echo "scale=2; $diferenca / $media_freq_pandemia * 100" | bc -l)
+
+    if (( $(echo "$diferenca > 0" | bc -l) )); then
+    echo -e "Media das frequencias do ano hibrido aumentaram em $percentual% em relacao aos anos da pandemia\n"
+    elif (( $(echo "$diferenca < 0" | bc -l) )); then
+    echo -e "Media das frequencias do ano hibrido diminuiram em $(echo "scale=2; $percentual * -1" | bc)% em relacao aos anos da pandemia\n"
+    else
+    echo -e "Não houve variação nas media das frequencias entre os anos da pandemia e o ano hibrido\n"
+    fi
+
+
+}
+
+compara_hibridos_anos_anteriores()
+{
+    # Calcula a media das frequencias do ano hibrido e as medias das frequencias dos anos da pandemia
+
+    diferenca=$(echo "$media_freq_hibrido - $media_freq_ant" | bc)
+    percentual=$(echo "scale=2; $diferenca / $media_freq_ant * 100" | bc -l)
+
+    if (( $(echo "$diferenca > 0" | bc -l) )); then
+    echo -e "Media das frequencias do ano hibrido aumentaram em $percentual% em relacao aos anos anteriores da pandemia\n"
+    elif (( $(echo "$diferenca < 0" | bc -l) )); then
+    echo -e "Media das frequencias do ano hibrido diminuiram em $(echo "scale=2; $percentual * -1" | bc)% em relacao aos anos anteriores da pandemia\n"
+    else
+    echo -e "Não houve variação nas media das frequencias entre os anos anteriores da pandemia e o ano hibrido\n"
+    fi
+
+
+    # Calcula a diferenca entre as medias dos reprovados do ano hibrido e as medias dos anos dos anos anteriores
+
+    diferenca=$(echo "$media_reprov_hibrido - $media_reprov_ant" | bc)
+    percentual=$(echo "scale=2; $diferenca / $media_reprov_ant * 100" | bc -l)
+
+    if (( $(echo "$diferenca > 0" | bc -l) )); then
+    echo -e "Media das notas dos reprovados do ano hibrido aumentaram em $percentual% em relacao aos anos anteriores da pandemia\n"
+    elif (( $(echo "$diferenca < 0" | bc -l) )); then
+    echo -e "Media das notas dos reprovados ano hibrido diminuiram em $(echo "scale=2; $percentual * -1" | bc)% em relacao aos anos anteriores da pandemia\n"
+    else
+    echo -e "Não houve variação nas media das notas dos reprovados entre os anos anteriores da pandemia e o ano hibrido\n"
+    fi
+
+    # Calcula a diferenca entre as medias dos aprovados do ano hibrido e as medias dos anos anteriores
+    diferenca=$(echo "$media_aprov_hibrido - $media_aprov_ant" | bc)
+    percentual=$(echo "scale=2; $diferenca / $media_aprov_ant * 100" | bc -l)
+
+    if (( $(echo "$diferenca > 0" | bc -l) )); then
+    echo -e "Media das notas dos aprovados do ano hibrido aumentaram em $percentual% em relacao aos anos anteriores da pandemia\n"
+    elif (( $(echo "$diferenca < 0" | bc -l) )); then
+    echo -e "Media das notas dos aprovados do ano hibrido diminuiram em $(echo "scale=2; $percentual * -1" | bc)% em relacao aos anos anteriores da pandemia\n"
+    else
+    echo -e "Não houve variação nas media das notas dos aprovados entre os anos anteriores da pandemia e o ano hibrido\n"
+    fi
+
+    # Calcula a diferencia entre as medias do ano hibrido e as medias dos anos anteriores a pandemia
+    diferenca=$(echo "$media_hibrido - $media_ant" | bc)
+    percentual=$(echo "scale=2; $diferenca / $media_ant * 100" | bc -l)
+
+    if (( $(echo "$diferenca > 0" | bc -l) )); then
+    echo -e "Media das notas do ano hibrido aumentaram em $percentual% em relacao aos anos anteriores da pandemia\n"
+    elif (( $(echo "$diferenca < 0" | bc -l) )); then
+    echo -e "Media das notas do ano hibrido diminuiram em $(echo "scale=2; $percentual * -1" | bc)% em relacao aos anos anteriores da pandemia\n"
+    else
+    echo -e "Não houve variação nas media das notas entre os anos anteriores da pandemia e o ano hibrido\n"
+    fi
+}
+
+media_aprov_hibrido
+media_reprov_hibrido
+compara_hibridos_pandemia
+compara_hibridos_anos_anteriores
+
+
+# Calcular a mediana das notas, cancelamentos, arrumar para ficar 100% e arrumar para nao remover o arquivo
+
+# # Remove todos os arquivos .csv no diretório atual
+# rm -f *.csv
