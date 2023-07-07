@@ -5,11 +5,11 @@ arquivo_base="historico-alg1_SIGA_ANONIMIZADO.csv"
 # Questao 1
 echo -e "\nQuestao 1:\n"
 awk -F',' '$4 != 2 || $5 != 2022 || $8 != 0 || $10 != "Aprovado" ' "$arquivo_base" > arquivo_base_filtrado.csv
-cat "$arquivo_base_filtrado.csv"    
+cat arquivo_base_filtrado.csv   
 
 # Questao 2 -----------------------------------------------------------
 echo -e "\nQuestao 2:\n"
-tail -n +2 "$arquivo_base_filtrado.csv" | cut -d ',' -f1,10 | sort | uniq > status_unicos.csv
+tail -n +2 arquivo_base_filtrado.csv | cut -d ',' -f1,10 | sort | uniq > status_unicos.csv
 cut -d ',' -f2 status_unicos.csv | sort | uniq > status_existentes.csv
 
 qtde_status=$(wc -l < "status_existentes.csv")
@@ -115,12 +115,15 @@ calcula_porcentagem() {
         total_reprovados=$(wc -l < "reprovados.$ano.csv")
         total_alunos=$((total_aprovados + total_reprovados))
 
-        # O resultado agora terá duas casas decimais
-        porcentagem_aprovacao=$(echo "scale=2; $total_aprovados / $total_alunos * 100" | bc -l)
-        porcentagem_reprovacao=$(echo "scale=2; $total_reprovados / $total_alunos * 100" | bc -l)
+        # Calculate the percentage with two decimal places
+        porcentagem_aprovacao=$(echo "scale=2; $total_aprovados * 100 / $total_alunos" | bc -l)
+        porcentagem_reprovacao=$(echo "scale=2; $total_reprovados * 100 / $total_alunos" | bc -l)
+
+        # Adjust the percentage of approval to ensure it sums up to 100%
+        porcentagem_aprovacao_ajustada=$(echo "scale=2; 100 - $porcentagem_reprovacao" | bc -l)
 
         echo "Ano $ano:"
-        echo "Porcentagem de aprovação: $porcentagem_aprovacao%"
+        echo "Porcentagem de aprovação: $porcentagem_aprovacao_ajustada%"
         echo "Porcentagem de reprovação: $porcentagem_reprovacao%"
 
         ((ano++))
@@ -689,8 +692,9 @@ media_reprov_hibrido
 compara_hibridos_pandemia
 compara_hibridos_anos_anteriores
 
-
-# Calcular a mediana das notas, cancelamentos, arrumar para ficar 100% e arrumar para nao remover o arquivo
-
-# # Remove todos os arquivos .csv no diretório atual
+apaga_arquivos_auxiliares()
+{
+    
+}
+# Remove todos os arquivos .csv no diretório atual
 # rm -f *.csv
