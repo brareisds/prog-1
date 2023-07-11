@@ -233,9 +233,7 @@ int main()
     srand(0);
    
     inicia_func_tarefas(funcionarios,tarefas);
-
     marcar_reunioes(funcionarios);
-
     realizar_reunioes(funcionarios, tarefas, &qtdes_reunioes_realizadas, &qtde_tarefas_tempo_restante_zero);
 
     printf("REUNIOES REALIZADAS %d\n", qtdes_reunioes_realizadas);
