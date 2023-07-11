@@ -8,6 +8,7 @@
 #define LIMITE 100
 #define MESES 12
 #define DIAS 31
+#define TAM 255
 
 typedef struct {
     int lideranca;
@@ -58,7 +59,7 @@ int sorteia_lider(funcionario_t funcionarios[])
 void marcar_reunioes(funcionario_t funcionarios[])
 {
     compromisso_t *compr_lider, *compr_func;
-    char descricao[255];
+    char descricao[TAM];
     horario_compromisso_t hc;
     funcionario_t lider;
     int func, mes, reunioes, dia_compr, id, aleat_func, membro, quant_membros, disponiveis, lider_disponivel, membro_disponivel, indice_lider;
