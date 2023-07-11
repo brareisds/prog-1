@@ -115,11 +115,11 @@ calcula_porcentagem() {
         total_reprovados=$(wc -l < "reprovados.$ano.csv")
         total_alunos=$((total_aprovados + total_reprovados))
 
-        # Calculate the percentage with two decimal places
+        # Calcula a porcentagem com duas casas decimais 
         porcentagem_aprovacao=$(echo "scale=2; $total_aprovados * 100 / $total_alunos" | bc -l)
         porcentagem_reprovacao=$(echo "scale=2; $total_reprovados * 100 / $total_alunos" | bc -l)
 
-        # Adjust the percentage of approval to ensure it sums up to 100%
+        # Ajusta a porcentagem para garantir que a soma dê 100%
         porcentagem_aprovacao_ajustada=$(echo "scale=2; 100 - $porcentagem_reprovacao" | bc -l)
 
         echo "Ano $ano:"
@@ -694,7 +694,15 @@ compara_hibridos_anos_anteriores
 
 apaga_arquivos_auxiliares()
 {
-    
+    arquivo_a_manter=$arquivo_base
+
+    # Percorre todos os arquivos no diretório
+    for arquivo in *.csv; do
+    if [ "$arquivo" != "$arquivo_a_manter" ]; then
+        rm "$arquivo"  
+    fi
+    done
+
 }
-# Remove todos os arquivos .csv no diretório atual
-# rm -f *.csv
+
+apaga_arquivos_auxiliares
